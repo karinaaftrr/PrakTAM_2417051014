@@ -3,8 +3,8 @@ package com.example.praktam_2417051014.Design
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -21,6 +21,7 @@ import com.example.praktam_2417051014.model.MapelSource
 
 @Composable
 fun DashboardScreen(innerPadding: PaddingValues) {
+
     val listMapel = MapelSource.dummyMapel
 
     Column(
@@ -28,85 +29,118 @@ fun DashboardScreen(innerPadding: PaddingValues) {
             .fillMaxSize()
             .background(Color.White)
             .padding(innerPadding)
+            .verticalScroll(rememberScrollState())
     ) {
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp, vertical = 28.dp)
         ) {
+
             Text(
                 text = "Hi, Karina Fitriamalia",
                 fontSize = 26.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = Color.Black
             )
+
             Text(
                 text = "BasicKuiz - Latihan Soal SMA (MIPA)",
-                fontSize = 16.sp,
+                fontSize = 18.sp,
                 color = Color.Gray
             )
         }
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-            contentPadding = PaddingValues(bottom = 30.dp)
+
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            items(listMapel) { mapel ->
+
+            listMapel.forEach { mapel ->
+
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE0E0E0)),
-                    shape = RoundedCornerShape(18.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFFE0E0E0)
+                    ),
+                    shape = RoundedCornerShape(18.dp)
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .padding(18.dp)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
+
+                    Column(
+                        modifier = Modifier.padding(26.dp)
                     ) {
 
-                        Box(
-                            modifier = Modifier
-                                .size(64.dp)
-                                .clip(RoundedCornerShape(14.dp))
-                                .background(Color.White),
-                            contentAlignment = Alignment.Center
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Image(
-                                painter = painterResource(id = mapel.imageRes),
-                                contentDescription = mapel.nama,
-                                modifier = Modifier.size(42.dp),
-                                contentScale = ContentScale.Fit
-                            )
-                        }
 
-                        Spacer(modifier = Modifier.width(20.dp))
+                            Box(
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clip(RoundedCornerShape(14.dp))
+                                    .background(Color.White),
+                                contentAlignment = Alignment.Center
+                            ) {
 
-                        Column(modifier = Modifier.weight(1f)) {
+                                Image(
+                                    painter = painterResource(id = mapel.imageRes),
+                                    contentDescription = mapel.nama,
+                                    modifier = Modifier.size(70.dp),
+                                    contentScale = ContentScale.Fit
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.width(24.dp))
+
+                            Column(modifier = Modifier.weight(1f)) {
+
+                                Text(
+                                    text = mapel.nama,
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black
+                                )
+
+                                Text(
+                                    text = mapel.deskripsi,
+                                    fontSize = 18.sp,
+                                    color = Color(0xFF555555)
+                                )
+                            }
+
                             Text(
-                                text = mapel.nama,
-                                fontSize = 20.sp,
+                                text = "Kls ${mapel.kelas}",
+                                fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.Black
-                            )
-                            Text(
-                                text = mapel.deskripsi,
-                                fontSize = 15.sp,
-                                color = Color(0xFF555555)
+                                color = Color(0xFF5C499C)
                             )
                         }
 
-                        Text(
-                            text = "Kls ${mapel.kelas}",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF5C499C)
-                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Button(
+                            onClick = { },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(55.dp),
+                            shape = RoundedCornerShape(10.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF5C499C)
+                            )
+                        ) {
+                            Text(
+                                text = "Mulai Quiz",
+                                color = Color.White,
+                                fontSize = 18.sp
+                            )
+                        }
                     }
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(40.dp))
     }
 }
