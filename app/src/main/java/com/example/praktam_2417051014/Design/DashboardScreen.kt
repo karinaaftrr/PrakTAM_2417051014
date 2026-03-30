@@ -21,9 +21,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.praktam_2417051014.model.MapelSource
 import com.example.praktam_2417051014.R
+import com.example.praktam_2417051014.model.MapelSource
 
 @Composable
 fun DashboardScreen(innerPadding: PaddingValues) {
@@ -34,7 +33,7 @@ fun DashboardScreen(innerPadding: PaddingValues) {
         modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()
-            .background(Color(0xFFF5F7FF))
+            .background(MaterialTheme.colorScheme.background)
             .padding(innerPadding),
         contentPadding = PaddingValues(bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -48,7 +47,10 @@ fun DashboardScreen(innerPadding: PaddingValues) {
                     .clip(RoundedCornerShape(24.dp))
                     .background(
                         Brush.horizontalGradient(
-                            listOf(Color(0xFF6A8DFF), Color(0xFF3F51B5))
+                            listOf(
+                                MaterialTheme.colorScheme.primaryContainer,
+                                MaterialTheme.colorScheme.secondaryContainer
+                            )
                         )
                     )
                     .padding(20.dp)
@@ -57,21 +59,20 @@ fun DashboardScreen(innerPadding: PaddingValues) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = "BasicKuizz",
-                            color = Color.White,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            style = MaterialTheme.typography.titleLarge
                         )
                         Text(
-                            text = "Mata Pelajaran MIPA",
-                            color = Color.White,
-                            fontSize = 14.sp
+                            text = "Mata Pelajaran Kurikulum Merdeka",
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
 
                     Icon(
                         painter = painterResource(id = R.drawable.simbol_basic),
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.size(40.dp)
                     )
                 }
@@ -82,37 +83,47 @@ fun DashboardScreen(innerPadding: PaddingValues) {
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Text(
                     text = "Hi, Karina Fitriamalia",
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.ExtraBold
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = "Pilih materi terlebih dahulu untuk mengerjakan soal",
-                    fontSize = 16.sp,
-                    color = Color.Gray
+                    text = "Mari mengerjakan soal!!",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
 
         item {
             Text(
-                text = "Kelas Terakhir",
+                text = "Pilih Kelas",
                 modifier = Modifier.padding(start = 16.dp),
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             LazyRow(
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(MapelSource.dummyMapel) { mapel ->
+
+                val kelasList = listOf(
+                    Pair("Kelas 10", R.drawable.kelas10),
+                    Pair("Kelas 11", R.drawable.kelas11),
+                    Pair("Kelas 12", R.drawable.kelas12)
+                )
+
+                items(kelasList) { kelas ->
 
                     Card(
                         modifier = Modifier
                             .width(200.dp)
-                            .height(180.dp),
+                            .height(190.dp),
                         shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = getMapelColor(mapel.nama)
+                            containerColor = MaterialTheme.colorScheme.surface
                         )
                     ) {
 
@@ -124,42 +135,36 @@ fun DashboardScreen(innerPadding: PaddingValues) {
                         ) {
 
                             Image(
-                                painter = painterResource(id = mapel.imageRes),
+                                painter = painterResource(id = kelas.second),
                                 contentDescription = null,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(80.dp),
+                                    .height(90.dp),
                                 contentScale = ContentScale.Fit
                             )
 
-                            Column {
-                                Text(
-                                    text = mapel.nama,
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold
-                                )
-
-                                Text(
-                                    text = "40 Soal",
-                                    color = Color.White.copy(0.8f),
-                                    fontSize = 12.sp
-                                )
-                            }
+                            Text(
+                                text = kelas.first,
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
 
                             Button(
                                 onClick = {},
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(36.dp),
+                                    .height(38.dp),
                                 shape = RoundedCornerShape(10.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.White
+                                    // Menggunakan warna primary dari Theme [cite: 65, 188]
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
                                 )
                             ) {
                                 Text(
-                                    "Mulai Quiz",
-                                    color = Color.Black,
-                                    fontSize = 12.sp
+                                    "Mulai",
+                                    style = MaterialTheme.typography.labelLarge
                                 )
                             }
                         }
@@ -170,9 +175,11 @@ fun DashboardScreen(innerPadding: PaddingValues) {
 
         item {
             Text(
-                text = "Semua Materi",
+                text = "History Pengerjaan",
                 modifier = Modifier.padding(start = 16.dp),
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
 
@@ -184,52 +191,39 @@ fun DashboardScreen(innerPadding: PaddingValues) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
+                shape = RoundedCornerShape(18.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = getMapelColor(mapel.nama)
-                ),
-                shape = RoundedCornerShape(18.dp)
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                )
             ) {
 
-                Column(modifier = Modifier.padding(20.dp)) {
+                Column(modifier = Modifier.padding(16.dp)) {
 
                     Box {
+
                         Row(verticalAlignment = Alignment.CenterVertically) {
 
-                            Box(
-                                modifier = Modifier
-                                    .size(80.dp)
-                                    .clip(RoundedCornerShape(14.dp))
-                                    .background(Color.White.copy(alpha = 0.2f)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Image(
-                                    painter = painterResource(id = mapel.imageRes),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(50.dp),
-                                    contentScale = ContentScale.Fit
-                                )
-                            }
+                            Image(
+                                painter = painterResource(id = mapel.imageRes),
+                                contentDescription = null,
+                                modifier = Modifier.size(60.dp)
+                            )
 
-                            Spacer(modifier = Modifier.width(16.dp))
+                            Spacer(modifier = Modifier.width(12.dp))
 
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = mapel.nama,
-                                    fontSize = 20.sp,
+                                    style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
                                 Text(
-                                    text = mapel.deskripsi,
-                                    color = Color.White.copy(0.8f)
+                                    text = "Nilai: ${mapel.nilai}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
                                 )
                             }
-
-                            Text(
-                                text = "Kls ${mapel.kelas}",
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold
-                            )
                         }
 
                         IconButton(
@@ -242,41 +236,31 @@ fun DashboardScreen(innerPadding: PaddingValues) {
                                 else
                                     Icons.Outlined.FavoriteBorder,
                                 contentDescription = null,
-                                tint = Color.White
+                                tint = Color(0xFFE57373)
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     Button(
                         onClick = {},
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(45.dp),
-                        shape = RoundedCornerShape(12.dp),
+                            .height(36.dp)
+                            .align(Alignment.End),
+                        shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.White
+                            containerColor = MaterialTheme.colorScheme.primary
                         )
                     ) {
                         Text(
-                            "Mulai Quiz",
-                            color = Color.Black,
-                            fontWeight = FontWeight.SemiBold
+                            "Mulai Lagi",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
             }
         }
-    }
-}
-
-fun getMapelColor(nama: String): Color {
-    return when (nama) {
-        "Biologi" -> Color(0xFF4CAF50)
-        "Kimia" -> Color(0xFFFFC107)
-        "Fisika" -> Color(0xFF607D8B)
-        "Matematika" -> Color(0xFFE53935)
-        else -> Color(0xFF3F51B5)
     }
 }
