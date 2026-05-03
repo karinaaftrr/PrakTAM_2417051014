@@ -16,263 +16,227 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.praktam_2417051014.R
-import com.example.praktam_2417051014.model.MapelSource
+import com.example.praktam_2417051014.model.MataPelajaran
+import com.example.praktam_2417051014.network.RetrofitClient
+import com.example.praktam_2417051014.ui.theme.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.rememberCoroutineScope
 
 @Composable
 fun DashboardScreen(innerPadding: PaddingValues, onNavigate: (String) -> Unit) {
 
-    val listMapel = MapelSource.dummyMapel
+    var listMapel by remember { mutableStateOf<List<MataPelajaran>>(emptyList()) }
+    var isLoadingData by remember { mutableStateOf(true) }
+
     var isLoading by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .statusBarsPadding()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(innerPadding),
-            contentPadding = PaddingValues(bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
+    LaunchedEffect(Unit) {
+        try {
+            listMapel = RetrofitClient.instance.getMapels()
+            isLoadingData = false
+        } catch (e: Exception) {
+            isLoadingData = false
+        }
+    }
 
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(
-                                    MaterialTheme.colorScheme.primaryContainer,
-                                    MaterialTheme.colorScheme.secondaryContainer
+    val kelasList = listOf(
+        Pair("Kelas 10", R.drawable.kelas10),
+        Pair("Kelas 11", R.drawable.kelas11),
+        Pair("Kelas 12", R.drawable.kelas12)
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppBackground)
+            .padding(innerPadding)
+    ) {
+
+        if (isLoadingData) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = BluePrimary)
+            }
+        } else {
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .clip(RoundedCornerShape(24.dp))
+                            .background(
+                                Brush.horizontalGradient(
+                                    listOf(BluePrimary, BlueSecondary)
                                 )
                             )
-                        )
-                        .padding(20.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Column(modifier = Modifier.weight(1f)) {
+                            .padding(20.dp)
+                    ) {
+                        Column {
                             Text(
-                                text = "BasicKuizz",
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                style = MaterialTheme.typography.titleLarge
+                                "BasicKuizz",
+                                color = TextPrimary,
+                                fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "Mata Pelajaran Kurikulum Merdeka",
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                style = MaterialTheme.typography.bodyMedium
+                                "Mata Pelajaran Kurikulum Merdeka",
+                                color = TextLight
                             )
                         }
+                    }
+                }
 
-                        Icon(
-                            painter = painterResource(id = R.drawable.simbol_basic),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier.size(40.dp)
+                item {
+                    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        Text(
+                            "Hi, Karina Fitriamalia",
+                            fontWeight = FontWeight.Bold,
+                            color = TextPrimary
+                        )
+                        Text(
+                            "Mari mengerjakan soal!!",
+                            color = TextSecondary
                         )
                     }
                 }
-            }
 
-            item {
-                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                item {
                     Text(
-                        text = "Hi, Karina Fitriamalia",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                    Text(
-                        text = "Mari mengerjakan soal!!",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            item {
-                Text(
-                    text = "Pilih Kelas",
-                    modifier = Modifier.padding(start = 16.dp),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    val kelasList = listOf(
-                        Pair("Kelas 10", R.drawable.kelas10),
-                        Pair("Kelas 11", R.drawable.kelas11),
-                        Pair("Kelas 12", R.drawable.kelas12)
+                        "Pilih Kelas",
+                        modifier = Modifier.padding(start = 16.dp),
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary
                     )
 
-                    items(kelasList) { kelas ->
-                        Card(
-                            modifier = Modifier
-                                .width(200.dp)
-                                .height(190.dp),
-                            shape = RoundedCornerShape(20.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surface
-                            )
-                        ) {
-                            Column(
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+
+                        items(kelasList) { kelas ->
+
+                            Card(
                                 modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(12.dp),
-                                verticalArrangement = Arrangement.SpaceBetween
+                                    .width(200.dp)
+                                    .height(190.dp),
+                                shape = RoundedCornerShape(20.dp),
+                                colors = CardDefaults.cardColors(containerColor = CardWhite)
                             ) {
-                                Image(
-                                    painter = painterResource(id = kelas.second),
-                                    contentDescription = null,
+                                Column(
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(90.dp),
-                                    contentScale = ContentScale.Fit
-                                )
-
-                                Text(
-                                    text = kelas.first,
-                                    style = MaterialTheme.typography.titleSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-
-                                Button(
-                                    onClick = {
-                                        coroutineScope.launch {
-                                            isLoading = true
-                                            delay(2000)
-                                            isLoading = false
-                                            snackbarHostState.showSnackbar("Berhasil masuk ke ${kelas.first}")
-                                            onNavigate(kelas.first)
-                                        }
-                                    },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(38.dp),
-                                    enabled = !isLoading,
-                                    shape = RoundedCornerShape(10.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primary,
-                                        contentColor = MaterialTheme.colorScheme.onPrimary
-                                    )
+                                        .fillMaxSize()
+                                        .padding(12.dp),
+                                    verticalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    if (isLoading) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(18.dp),
-                                            color = MaterialTheme.colorScheme.onPrimary,
-                                            strokeWidth = 2.dp
+
+                                    Image(
+                                        painter = painterResource(kelas.second),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(90.dp),
+                                        contentScale = ContentScale.Crop
+                                    )
+
+                                    Text(
+                                        kelas.first,
+                                        fontWeight = FontWeight.Bold,
+                                        color = TextPrimary
+                                    )
+
+                                    Button(
+                                        onClick = {
+                                            coroutineScope.launch {
+                                                isLoading = true
+                                                delay(2000)
+                                                isLoading = false
+                                                snackbarHostState.showSnackbar("Masuk ke ${kelas.first}")
+                                                onNavigate(kelas.first)
+                                            }
+                                        },
+                                        modifier = Modifier.fillMaxWidth(),
+                                        enabled = !isLoading,
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = BluePrimary,
+                                            contentColor = TextPrimary
                                         )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text("Memproses...", style = MaterialTheme.typography.labelLarge)
-                                    } else {
-                                        Text("Mulai", style = MaterialTheme.typography.labelLarge)
+                                    ) {
+                                        if (isLoading) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(18.dp),
+                                                color = TextPrimary
+                                            )
+                                        } else {
+                                            Text("Mulai")
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            item {
-                Text(
-                    text = "History Pengerjaan",
-                    modifier = Modifier.padding(start = 16.dp),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-            }
-
-            items(listMapel) { mapel ->
-                var isFavorite by remember { mutableStateOf(false) }
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    shape = RoundedCornerShape(18.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                item {
+                    Text(
+                        "History",
+                        modifier = Modifier.padding(start = 16.dp),
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary
                     )
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Box {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Image(
-                                    painter = painterResource(id = mapel.imageRes),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(60.dp)
-                                )
+                }
 
-                                Spacer(modifier = Modifier.width(12.dp))
+                items(listMapel.take(3)) { mapel ->
 
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = mapel.nama,
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                                    )
-                                    Text(
-                                        text = "Nilai: ${mapel.nilai}",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
-                                    )
-                                }
-                            }
+                    var isFavorite by remember { mutableStateOf(false) }
 
-                            IconButton(
-                                onClick = { isFavorite = !isFavorite },
-                                modifier = Modifier.align(Alignment.TopEnd)
-                            ) {
-                                Icon(
-                                    imageVector = if (isFavorite)
-                                        Icons.Filled.Favorite
-                                    else
-                                        Icons.Outlined.FavoriteBorder,
-                                    contentDescription = null,
-                                    tint = Color(0xFFE57373)
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Button(
-                            onClick = {},
-                            modifier = Modifier
-                                .height(36.dp)
-                                .align(Alignment.End),
-                            shape = RoundedCornerShape(10.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary
-                            )
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        shape = RoundedCornerShape(18.dp),
+                        colors = CardDefaults.cardColors(containerColor = BlueDark)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                "Mulai Lagi",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onPrimary
+
+                            AsyncImage(
+                                model = mapel.imageUrl,
+                                contentDescription = null,
+                                placeholder = painterResource(R.drawable.matematika),
+                                error = painterResource(R.drawable.matematika),
+                                modifier = Modifier.size(50.dp),
+                                contentScale = ContentScale.Crop
                             )
+
+                            Spacer(modifier = Modifier.width(12.dp))
+
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(mapel.nama, fontWeight = FontWeight.Bold, color = TextPrimary)
+                                Text("Nilai: ${mapel.nilai}", color = TextSecondary)
+                            }
+
+                            IconButton(onClick = { isFavorite = !isFavorite }) {
+                                Icon(
+                                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                                    contentDescription = null,
+                                    tint = FavoriteRed
+                                )
+                            }
                         }
                     }
                 }
@@ -281,9 +245,7 @@ fun DashboardScreen(innerPadding: PaddingValues, onNavigate: (String) -> Unit) {
 
         SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp)
+            modifier = Modifier.align(Alignment.BottomCenter)
         )
     }
 }

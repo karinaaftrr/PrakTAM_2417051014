@@ -1,10 +1,12 @@
 package com.example.praktam_2417051014.model
-import androidx.annotation.DrawableRes
+
+import com.google.gson.annotations.SerializedName
 
 data class MataPelajaran(
-    val nama: String,
-    val deskripsi: String,
-    val kelas: Int,
-    val nilai: String,
-    @DrawableRes val imageRes: Int
+    @SerializedName("nama") val nama: String,
+    @SerializedName("deskripsi") val deskripsi: String,
+    @SerializedName("kelas") val kelas: Int,
+    @SerializedName("nilai") val nilai: String,
+    @SerializedName("image_url")
+    val imageUrl: String
 )
