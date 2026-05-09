@@ -7,12 +7,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -81,7 +81,6 @@ fun PilihMapelScreen(
             when {
 
                 isLoading -> {
-
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -91,7 +90,6 @@ fun PilihMapelScreen(
                 }
 
                 isError -> {
-
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -99,7 +97,6 @@ fun PilihMapelScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-
                         Text(
                             text = "Gagal Memuat Data",
                             style = MaterialTheme.typography.titleMedium,
@@ -110,15 +107,29 @@ fun PilihMapelScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "Pastikan koneksi internet aktif",
+                            text = "Koneksi tidak tersedia / server error",
                             style = MaterialTheme.typography.bodyMedium,
                             color = TextSecondary
                         )
                     }
                 }
 
-                else -> {
+                listMapel.isEmpty() -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        contentAlignment = Alignment.Center
+                    )  {
+                        Text(
+                            text = "Tidak ada data / periksa koneksi internet",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = FavoriteRed
+                        )
+                    }
+                }
 
+                else -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(16.dp),
@@ -139,9 +150,7 @@ fun PilihMapelScreen(
                                 mapel = mapel,
                                 onClick = {
                                     coroutineScope.launch {
-                                        snackbarHostState.showSnackbar(
-                                            "Kuis ${mapel.nama} dimulai!"
-                                        )
+                                        snackbarHostState.showSnackbar("Kuis ${mapel.nama} dimulai!")
                                     }
                                 }
                             )
@@ -179,8 +188,7 @@ fun MapelCard(
                 contentDescription = null,
                 placeholder = painterResource(R.drawable.matematika),
                 error = painterResource(R.drawable.matematika),
-                modifier = Modifier.size(50.dp),
-                contentScale = ContentScale.Crop
+                modifier = Modifier.size(50.dp)
             )
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -222,11 +230,7 @@ fun MapelCard(
                         strokeWidth = 2.dp
                     )
                 } else {
-                    Text(
-                        text = "Pilih",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = Color.White
-                    )
+                    Text("Pilih")
                 }
             }
         }
