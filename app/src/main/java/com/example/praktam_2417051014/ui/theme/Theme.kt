@@ -12,20 +12,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val AppLightColorScheme = lightColorScheme(
-    primary = BluePrimary,
-    secondary = BlueSecondary,
+    primary = PrimaryColor,
+    secondary = SecondaryColor,
+    tertiary = AccentColor,
     background = AppBackground,
     surface = CardWhite,
     onPrimary = Color.White,
+    onSecondary = TextPrimary,
     onBackground = TextPrimary,
     onSurface = TextPrimary
 )
 
-
 private val AppDarkColorScheme = darkColorScheme(
-    primary = BluePrimary,
-    secondary = BlueSecondary,
-    background = Color(0xFF121212)
+    primary = PrimaryColor,
+    secondary = SecondaryColor,
+    tertiary = AccentColor,
+    background = AppBackground,
+    surface = CardWhite,
+    onPrimary = Color.White,
+    onSecondary = TextPrimary,
+    onBackground = TextPrimary,
+    onSurface = TextPrimary
 )
 
 @Composable
@@ -37,7 +44,8 @@ fun PrakTAM_2417051014Theme(
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (darkTheme) dynamicDarkColorScheme(context)
+            else dynamicLightColorScheme(context)
         }
         darkTheme -> AppDarkColorScheme
         else -> AppLightColorScheme

@@ -2,15 +2,15 @@ package com.example.praktam_2417051014.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val AppBackground = Color(0xFFF7F8FC)
+val AppBackground = Color(0xFFF6FBFF)
 
-val BluePrimary = Color(0xFFB3C7F9)
-val BlueSecondary = Color(0xFFD4E0FF)
-val BlueDark = Color(0xFFE3ECFF)
+val PrimaryColor = Color(0xFF0277BD)
+val SecondaryColor = Color(0xFF81D4FA)
+val AccentColor = Color(0xFF4FC3F7)
 
-val TextPrimary = Color(0xFF2C2C2C)
-val TextSecondary = Color(0xFF6B6B6B)
-val TextLight = Color(0xFF444444)
+val TextPrimary = Color(0xFF1F2A37)
+val TextSecondary = Color(0xFF5B6B7A)
+val TextLight = Color(0xFF8A9BA8)
 
 val CardWhite = Color.White
 val FavoriteRed = Color(0xFFE57373)

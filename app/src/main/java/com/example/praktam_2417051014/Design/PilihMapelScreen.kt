@@ -1,11 +1,12 @@
 package com.example.praktam_2417051014.Design
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,157 +15,188 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.praktam_2417051014.R
-import com.example.praktam_2417051014.model.MataPelajaran
-import com.example.praktam_2417051014.network.RetrofitClient
+import com.example.praktam_2417051014.data.model.MataPelajaran
 import com.example.praktam_2417051014.ui.theme.*
-import kotlinx.coroutines.delay
+import com.example.praktam_2417051014.viewmodel.MapelViewModel
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PilihMapelScreen(
     navController: NavController,
     namaKelas: String,
     innerPadding: PaddingValues
 ) {
+
+    val viewModel: MapelViewModel = viewModel()
+
+    val listMapel = viewModel.listMapel
+    val isLoading = viewModel.isLoading
+    val isError = viewModel.isError
+
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    var listMapel by remember { mutableStateOf<List<MataPelajaran>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(true) }
-    var isError by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        try {
-            listMapel = RetrofitClient.instance.getMapels()
-            isLoading = false
-            isError = false
-            snackbarHostState.showSnackbar("Data berhasil dimuat")
-        } catch (e: Exception) {
-            isLoading = false
-            isError = true
-            snackbarHostState.showSnackbar("Gagal memuat data")
-            Log.e("PilihMapelScreen", "Error: ${e.message}")
-        }
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AppBackground)
-            .padding(innerPadding)
-    ) {
-        when {
-            isLoading -> {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = BluePrimary)
-                }
-            }
-
-            isError -> {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
+    Scaffold(
+        containerColor = AppBackground,
+        topBar = {
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = PrimaryColor
+                ),
+                title = {
                     Text(
-                        text = "Gagal Memuat Data",
-                        style = MaterialTheme.typography.titleLarge,
+                        text = "Pilih Mapel - $namaKelas",
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Red
+                        color = Color.White
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Pastikan koneksi internet Anda menyala",
-                        textAlign = TextAlign.Center
-                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
                 }
-            }
+            )
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { padding ->
 
-            else -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    item {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(AppBackground)
+                .padding(padding)
+        ) {
+
+            when {
+
+                isLoading -> {
+
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = PrimaryColor)
+                    }
+                }
+
+                isError -> {
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+
                         Text(
-                            text = "Pilih Mata Pelajaran - $namaKelas",
-                            style = MaterialTheme.typography.headlineSmall,
+                            text = "Gagal Memuat Data",
+                            style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = TextPrimary
                         )
-                    }
 
-                    items(listMapel) { mapel ->
-                        MapelItem(
-                            mapel = mapel,
-                            onPilihClick = {
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar("Kuis ${mapel.nama} dimulai!")
-                                }
-                            }
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = "Pastikan koneksi internet aktif",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = TextSecondary
                         )
+                    }
+                }
+
+                else -> {
+
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+
+                        item {
+                            Text(
+                                text = "Daftar Mata Pelajaran",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = TextPrimary
+                            )
+                        }
+
+                        items(listMapel) { mapel ->
+                            MapelCard(
+                                mapel = mapel,
+                                onClick = {
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            "Kuis ${mapel.nama} dimulai!"
+                                        )
+                                    }
+                                }
+                            )
+                        }
                     }
                 }
             }
         }
-
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp)
-        )
     }
 }
 
 @Composable
-fun MapelItem(
+fun MapelCard(
     mapel: MataPelajaran,
-    onPilihClick: () -> Unit
+    onClick: () -> Unit
 ) {
-    var isLoadingItem by remember { mutableStateOf(false) }
+
+    var loading by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = CardWhite),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
+
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+
             AsyncImage(
                 model = mapel.imageUrl,
-                contentDescription = mapel.nama,
+                contentDescription = null,
                 placeholder = painterResource(R.drawable.matematika),
                 error = painterResource(R.drawable.matematika),
                 modifier = Modifier.size(50.dp),
                 contentScale = ContentScale.Crop
             )
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
+
                 Text(
                     text = mapel.nama,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
                     color = TextPrimary
                 )
+
                 Text(
                     text = "Nilai: ${mapel.nilai}",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = TextSecondary
                 )
             }
@@ -172,27 +204,29 @@ fun MapelItem(
             Button(
                 onClick = {
                     scope.launch {
-                        isLoadingItem = true
-                        delay(1500)
-                        isLoadingItem = false
-                        onPilihClick()
+                        loading = true
+                        kotlinx.coroutines.delay(1200)
+                        loading = false
+                        onClick()
                     }
                 },
-                enabled = !isLoadingItem,
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = BluePrimary,
-                    contentColor = TextPrimary
-                )
+                enabled = !loading,
+                colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor),
+                shape = RoundedCornerShape(12.dp)
             ) {
-                if (isLoadingItem) {
+
+                if (loading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(18.dp),
-                        color = TextPrimary,
+                        color = Color.White,
                         strokeWidth = 2.dp
                     )
                 } else {
-                    Text("Pilih", fontWeight = FontWeight.Bold)
+                    Text(
+                        text = "Pilih",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Color.White
+                    )
                 }
             }
         }

@@ -18,34 +18,33 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.praktam_2417051014.R
-import com.example.praktam_2417051014.model.MataPelajaran
-import com.example.praktam_2417051014.network.RetrofitClient
-import com.example.praktam_2417051014.ui.theme.*
-import kotlinx.coroutines.delay
+import com.example.praktam_2417051014.data.model.MataPelajaran
+import com.example.praktam_2417051014.viewmodel.MapelViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
+import com.example.praktam_2417051014.ui.theme.AppBackground
+import com.example.praktam_2417051014.ui.theme.PrimaryColor
+import com.example.praktam_2417051014.ui.theme.SecondaryColor
+import com.example.praktam_2417051014.ui.theme.TextPrimary
+import com.example.praktam_2417051014.ui.theme.TextSecondary
 
 @Composable
-fun DashboardScreen(innerPadding: PaddingValues, onNavigate: (String) -> Unit) {
+fun DashboardScreen(
+    innerPadding: PaddingValues,
+    onNavigate: (String) -> Unit
+) {
 
-    var listMapel by remember { mutableStateOf<List<MataPelajaran>>(emptyList()) }
-    var isLoadingData by remember { mutableStateOf(true) }
+    val viewModel: MapelViewModel = viewModel()
 
-    var isLoading by remember { mutableStateOf(false) }
+    val listMapel = viewModel.listMapel
+    val isLoadingData = viewModel.isLoading
+
+    val loadingState = remember { mutableStateMapOf<String, Boolean>() }
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(Unit) {
-        try {
-            listMapel = RetrofitClient.instance.getMapels()
-            isLoadingData = false
-        } catch (e: Exception) {
-            isLoadingData = false
-        }
-    }
 
     val kelasList = listOf(
         Pair("Kelas 10", R.drawable.kelas10),
@@ -53,199 +52,234 @@ fun DashboardScreen(innerPadding: PaddingValues, onNavigate: (String) -> Unit) {
         Pair("Kelas 12", R.drawable.kelas12)
     )
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AppBackground)
-            .padding(innerPadding)
-    ) {
+    Scaffold(
+        containerColor = AppBackground,
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { padding ->
 
-        if (isLoadingData) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = BluePrimary)
-            }
-        } else {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(AppBackground)
+                .padding(padding)
+        ) {
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
+            if (isLoadingData) {
 
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .clip(RoundedCornerShape(24.dp))
-                            .background(
-                                Brush.horizontalGradient(
-                                    listOf(BluePrimary, BlueSecondary)
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = PrimaryColor)
+                }
+
+            } else {
+
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(bottom = 24.dp)
+                ) {
+
+                    item {
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .clip(RoundedCornerShape(24.dp))
+                                .background(
+                                    Brush.horizontalGradient(
+                                        listOf(PrimaryColor, SecondaryColor)
+                                    )
                                 )
-                            )
-                            .padding(20.dp)
-                    ) {
-                        Column {
+                                .padding(20.dp)
+                        ) {
+
+                            Column {
+
+                                Text(
+                                    "BasicKuizz",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = androidx.compose.ui.graphics.Color.White
+                                )
+
+                                Text(
+                                    "Mata Pelajaran Kurikulum Merdeka",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = androidx.compose.ui.graphics.Color.White
+                                )
+                            }
+                        }
+                    }
+
+                    item {
+
+                        Column(Modifier.padding(horizontal = 16.dp)) {
+
                             Text(
-                                "BasicKuizz",
-                                color = TextPrimary,
-                                fontWeight = FontWeight.Bold
+                                "Hi, Karina Fitriamalia",
+                                style = MaterialTheme.typography.headlineMedium,
+                                color = TextPrimary
                             )
+
                             Text(
-                                "Mata Pelajaran Kurikulum Merdeka",
-                                color = TextLight
+                                "Mari mengerjakan soal!!",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = TextSecondary
                             )
                         }
                     }
-                }
 
-                item {
-                    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    item {
+
                         Text(
-                            "Hi, Karina Fitriamalia",
-                            fontWeight = FontWeight.Bold,
+                            "Pilih Kelas",
+                            modifier = Modifier.padding(start = 16.dp),
+                            style = MaterialTheme.typography.titleMedium,
                             color = TextPrimary
                         )
-                        Text(
-                            "Mari mengerjakan soal!!",
-                            color = TextSecondary
-                        )
-                    }
-                }
 
-                item {
-                    Text(
-                        "Pilih Kelas",
-                        modifier = Modifier.padding(start = 16.dp),
-                        fontWeight = FontWeight.Bold,
-                        color = TextPrimary
-                    )
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
 
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
+                            items(kelasList) { kelas ->
 
-                        items(kelasList) { kelas ->
+                                val isLoading = loadingState[kelas.first] == true
 
-                            Card(
-                                modifier = Modifier
-                                    .width(200.dp)
-                                    .height(190.dp),
-                                shape = RoundedCornerShape(20.dp),
-                                colors = CardDefaults.cardColors(containerColor = CardWhite)
-                            ) {
-                                Column(
+                                Card(
                                     modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(12.dp),
-                                    verticalArrangement = Arrangement.SpaceBetween
+                                        .width(200.dp)
+                                        .height(190.dp),
+                                    shape = RoundedCornerShape(20.dp),
+                                    colors = CardDefaults.cardColors(containerColor = PrimaryColor)
                                 ) {
 
-                                    Image(
-                                        painter = painterResource(kelas.second),
-                                        contentDescription = null,
+                                    Column(
                                         modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(90.dp),
-                                        contentScale = ContentScale.Crop
-                                    )
-
-                                    Text(
-                                        kelas.first,
-                                        fontWeight = FontWeight.Bold,
-                                        color = TextPrimary
-                                    )
-
-                                    Button(
-                                        onClick = {
-                                            coroutineScope.launch {
-                                                isLoading = true
-                                                delay(2000)
-                                                isLoading = false
-                                                snackbarHostState.showSnackbar("Masuk ke ${kelas.first}")
-                                                onNavigate(kelas.first)
-                                            }
-                                        },
-                                        modifier = Modifier.fillMaxWidth(),
-                                        enabled = !isLoading,
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = BluePrimary,
-                                            contentColor = TextPrimary
-                                        )
+                                            .fillMaxSize()
+                                            .padding(12.dp),
+                                        verticalArrangement = Arrangement.SpaceBetween
                                     ) {
-                                        if (isLoading) {
-                                            CircularProgressIndicator(
-                                                modifier = Modifier.size(18.dp),
-                                                color = TextPrimary
+
+                                        Image(
+                                            painter = painterResource(kelas.second),
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(90.dp),
+                                            contentScale = ContentScale.Crop
+                                        )
+
+                                        Text(
+                                            kelas.first,
+                                            style = MaterialTheme.typography.titleSmall,
+                                            color = androidx.compose.ui.graphics.Color.White
+                                        )
+
+                                        Button(
+                                            onClick = {
+                                                coroutineScope.launch {
+                                                    loadingState[kelas.first] = true
+                                                    kotlinx.coroutines.delay(1200)
+                                                    loadingState[kelas.first] = false
+                                                    snackbarHostState.showSnackbar("Masuk ${kelas.first}")
+                                                    onNavigate("pilih_mapel/${kelas.first}")
+                                                }
+                                            },
+                                            modifier = Modifier.fillMaxWidth(),
+                                            enabled = !isLoading,
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = androidx.compose.ui.graphics.Color.White,
+                                                contentColor = PrimaryColor
                                             )
-                                        } else {
-                                            Text("Mulai")
+                                        ) {
+
+                                            if (isLoading) {
+                                                CircularProgressIndicator(
+                                                    modifier = Modifier.size(18.dp),
+                                                    color = PrimaryColor
+                                                )
+                                            } else {
+                                                Text("Mulai")
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                item {
-                    Text(
-                        "History",
-                        modifier = Modifier.padding(start = 16.dp),
-                        fontWeight = FontWeight.Bold,
-                        color = TextPrimary
-                    )
-                }
+                    item {
 
-                items(listMapel.take(3)) { mapel ->
+                        Text(
+                            "History",
+                            modifier = Modifier.padding(start = 16.dp),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = TextPrimary
+                        )
+                    }
 
-                    var isFavorite by remember { mutableStateOf(false) }
+                    items(listMapel.take(3)) { mapel ->
 
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        shape = RoundedCornerShape(18.dp),
-                        colors = CardDefaults.cardColors(containerColor = BlueDark)
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                        var isFavorite by remember { mutableStateOf(false) }
+
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            shape = RoundedCornerShape(18.dp),
+                            colors = CardDefaults.cardColors(containerColor = PrimaryColor)
                         ) {
 
-                            AsyncImage(
-                                model = mapel.imageUrl,
-                                contentDescription = null,
-                                placeholder = painterResource(R.drawable.matematika),
-                                error = painterResource(R.drawable.matematika),
-                                modifier = Modifier.size(50.dp),
-                                contentScale = ContentScale.Crop
-                            )
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
 
-                            Spacer(modifier = Modifier.width(12.dp))
-
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(mapel.nama, fontWeight = FontWeight.Bold, color = TextPrimary)
-                                Text("Nilai: ${mapel.nilai}", color = TextSecondary)
-                            }
-
-                            IconButton(onClick = { isFavorite = !isFavorite }) {
-                                Icon(
-                                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                                AsyncImage(
+                                    model = mapel.imageUrl,
                                     contentDescription = null,
-                                    tint = FavoriteRed
+                                    placeholder = painterResource(R.drawable.matematika),
+                                    error = painterResource(R.drawable.matematika),
+                                    modifier = Modifier.size(50.dp),
+                                    contentScale = ContentScale.Crop
                                 )
+
+                                Spacer(modifier = Modifier.width(12.dp))
+
+                                Column(modifier = Modifier.weight(1f)) {
+
+                                    Text(
+                                        mapel.nama,
+                                        style = MaterialTheme.typography.titleSmall,
+                                        color = androidx.compose.ui.graphics.Color.White
+                                    )
+
+                                    Text(
+                                        "Nilai: ${mapel.nilai}",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = androidx.compose.ui.graphics.Color.White
+                                    )
+                                }
+
+                                IconButton(onClick = { isFavorite = !isFavorite }) {
+
+                                    Icon(
+                                        imageVector = if (isFavorite)
+                                            Icons.Filled.Favorite
+                                        else
+                                            Icons.Outlined.FavoriteBorder,
+                                        contentDescription = null,
+                                        tint = androidx.compose.ui.graphics.Color.White
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
         }
-
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
     }
 }
