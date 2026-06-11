@@ -5,18 +5,25 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.rememberNavController
-import com.example.praktam_2417051014.Navigation.NavigationScreen
-import com.example.praktam_2417051014.ui.theme.PrakTAM_2417051014Theme
+import com.example.praktam_2417051014.ui.navigation.NavigationScreen
+import com.example.praktam_2417051014.ui.theme.PraktamTheme
 
 class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
+
+    override fun onCreate(
+        savedInstanceState: Bundle?
+    ) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
 
         setContent {
-            PrakTAM_2417051014Theme {
+            PraktamTheme {
                 val navController = rememberNavController()
-                NavigationScreen(navController)
+
+                NavigationScreen(
+                    navController = navController
+                )
             }
         }
     }

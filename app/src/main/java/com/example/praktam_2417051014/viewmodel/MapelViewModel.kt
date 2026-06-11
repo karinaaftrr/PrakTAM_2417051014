@@ -1,55 +1,58 @@
 package com.example.praktam_2417051014.viewmodel
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.praktam_2417051014.data.model.MataPelajaran
+import com.example.praktam_2417051014.data.model.Mapel
 import com.example.praktam_2417051014.data.repository.MapelRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class MapelViewModel : ViewModel() {
 
     private val repository = MapelRepository()
 
-    var listMapel by mutableStateOf<List<MataPelajaran>>(emptyList())
-        private set
+    private val _mapel = MutableStateFlow<List<Mapel>>(emptyList())
+    val mapel: StateFlow<List<Mapel>> = _mapel
 
-    var isLoading by mutableStateOf(false)
-        private set
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
 
-    var isError by mutableStateOf(false)
-        private set
-
-    var isEmpty by mutableStateOf(false)
-        private set
+    private val _isError = MutableStateFlow(false)
+    val isError: StateFlow<Boolean> = _isError
 
     init {
-        getMapel()
+        getAllMapel()
     }
 
-    fun getMapel() {
-
+    private fun getAllMapel() {
         viewModelScope.launch {
-
-            isLoading = true
-            isError = false
-            isEmpty = false
+            _isLoading.value = true
+            _isError.value = false
 
             try {
+                val result = repository.getMapelIPA() // fetch sekali, sudah berisi IPA + IPS
 
-                val data = repository.getMapel()
-                listMapel = data
+                _mapel.value = result
+                _isError.value = result.isEmpty()
 
-                isEmpty = data.isEmpty()
-
-            } catch (_: Exception) {
-
-                isError = true
+            } catch (e: Exception) {
+                _mapel.value = emptyList()
+                _isError.value = true
             }
 
-            isLoading = false
+            _isLoading.value = false
         }
+    }
+
+    fun filterMapel(kelas: String, kategori: String): List<Mapel> {
+        return _mapel.value.filter {
+            it.kelas.trim().equals(kelas.trim(), ignoreCase = true) &&
+                    it.kategori.trim().equals(kategori.trim(), ignoreCase = true)
+        }
+    }
+
+    fun refresh() {
+        getAllMapel()
     }
 }

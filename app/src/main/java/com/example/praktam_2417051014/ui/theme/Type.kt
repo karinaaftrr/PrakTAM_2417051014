@@ -9,65 +9,58 @@ import androidx.compose.ui.unit.sp
 import com.example.praktam_2417051014.R
 
 val Montserrat = FontFamily(
-    Font(R.font.montserrat_regular, FontWeight.Normal),
-    Font(R.font.montserrat_medium, FontWeight.Medium),
-    Font(R.font.montserrat_bold, FontWeight.Bold)
+
+    Font(
+        resId = R.font.montserrat_regular,
+        weight = FontWeight.Normal
+    ),
+
+    Font(
+        resId = R.font.montserrat_medium,
+        weight = FontWeight.Medium
+    ),
+
+    Font(
+        resId = R.font.montserrat_bold,
+        weight = FontWeight.Bold
+    )
 )
 
-val Typography = Typography(
+val AppTypography = Typography(
+
+    headlineLarge = TextStyle(
+        fontFamily = Montserrat,
+        fontWeight = FontWeight.Bold,
+        fontSize = 32.sp
+    ),
+
     headlineMedium = TextStyle(
         fontFamily = Montserrat,
-        fontWeight = FontWeight.ExtraBold,
-        fontSize = 26.sp,
-        lineHeight = 32.sp,
-        letterSpacing = 0.sp
+        fontWeight = FontWeight.Bold,
+        fontSize = 24.sp
     ),
 
     titleLarge = TextStyle(
         fontFamily = Montserrat,
-        fontWeight = FontWeight.Bold,
-        fontSize = 20.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
-    ),
-
-    titleMedium = TextStyle(
-        fontFamily = Montserrat,
-        fontWeight = FontWeight.Bold,
-        fontSize = 18.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.15.sp
-    ),
-
-    titleSmall = TextStyle(
-        fontFamily = Montserrat,
-        fontWeight = FontWeight.Bold,
-        fontSize = 16.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.1.sp
+        fontWeight = FontWeight.Medium,
+        fontSize = 20.sp
     ),
 
     bodyLarge = TextStyle(
         fontFamily = Montserrat,
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
+        fontSize = 16.sp
     ),
 
     bodyMedium = TextStyle(
         fontFamily = Montserrat,
         fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.25.sp
+        fontSize = 14.sp
     ),
 
-    labelLarge = TextStyle(
+    bodySmall = TextStyle(
         fontFamily = Montserrat,
-        fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.1.sp
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp
     )
 )
